@@ -21,6 +21,8 @@ console.log('test');
 JS;
 echo $js . PHP_EOL;
 
+"test\r";
+"test\n";
 
 $concat1 = 'test';
 $concat2 = 'qwerty_' . $concat1;
