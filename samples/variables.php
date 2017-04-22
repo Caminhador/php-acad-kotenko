@@ -20,5 +20,11 @@ $var1 = 123;
 $var2 = &$var1;
 
 $var1 = 321;
-var_dump($var1, $var2);
+//var_dump($var1, $var2);
+
+$test = 'qwerty';
+$qwerty = 'test';
+
+var_dump(${${$test}});
+
 
