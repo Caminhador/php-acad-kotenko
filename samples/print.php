@@ -22,3 +22,11 @@ JS;
 echo $js . PHP_EOL;
 
 
+$concat1 = 'test';
+$concat2 = 'qwerty_' . $concat1;
+$concat2 .= '_test';
+
+var_dump($concat2);
+
+$printf = printf('test_%s_test', 'qwerty');
+var_dump($printf);
