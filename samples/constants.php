@@ -7,3 +7,5 @@ var_dump(TEST_CONST);
 
 const TEST = 12;
 var_dump(TEST);
+
+var_dump(__DIR__, __FILE__, __LINE__);
