@@ -96,6 +96,8 @@ $array = [
 // res 11
 var_dump(countRecursive($array));
 
+echo PHP_EOL;
+
 $baseDir = 'D:\dkotenko\php-acad-kotenko\samples';
 
 function readRecursive($dir, $level = 0)
@@ -113,3 +115,13 @@ function readRecursive($dir, $level = 0)
 }
 
 readRecursive($baseDir);
+
+echo PHP_EOL;
+
+$files = array_filter(explode("\n", `dir D:\dkotenko\php-acad-kotenko /B`));
+var_dump($files);
+
+echo PHP_EOL;
+
+$str = 'test|qwert|1231231';
+var_dump(explode('|', $str));
