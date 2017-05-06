@@ -92,3 +92,24 @@ $part2 = 'From';
 $part3 = 'Variable';
 $funcName = $part1 . $part2 . $part3;
 $funcName();
+
+echo PHP_EOL;
+
+function linkedVar(&$var)
+{
+    $var = 'qwerty';
+}
+
+$test = 12;
+var_dump($test);
+linkedVar($test);
+var_dump($test);
+
+echo PHP_EOL;
+
+$array3 = [1, 2, 3, 3, 5];
+foreach ($array3 as &$item) {
+    $item += 3;
+}
+
+var_dump($array3);
