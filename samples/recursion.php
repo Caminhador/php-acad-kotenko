@@ -10,7 +10,7 @@ var_dump($e1, $e2, $e3);
 
 echo PHP_EOL;
 
-list(,,, $e4) = toArray(3, 5, 6, 7, 8);
+list(, , , $e4) = toArray(3, 5, 6, 7, 8);
 var_dump($e4);
 
 echo PHP_EOL;
@@ -33,6 +33,7 @@ function getAssocArray()
         'quantity' => 12
     ];
 }
+
 $record = getAssocArray();
 var_dump($record['title'], $record['quantity']);
 
@@ -59,10 +60,11 @@ var_dump(power($n1, $n2), pow($n1, $n2));
 
 echo PHP_EOL;
 
-function countRecursive($array) {
+function countRecursive($array)
+{
     $count = 0;
-    foreach($array as $item){
-        if(is_array($item)){
+    foreach ($array as $item) {
+        if (is_array($item)) {
             $count += countRecursive($item);
         }
         $count++;
@@ -96,17 +98,18 @@ var_dump(countRecursive($array));
 
 $baseDir = 'D:\dkotenko\php-acad-kotenko\samples';
 
-function readRecursive($dir, $level) {
-    foreach ( scandir($dir) as $item ) {
-        if ( in_array($item, ['.', '..']) ) {
+function readRecursive($dir, $level = 0)
+{
+    foreach (scandir($dir) as $item) {
+        if (in_array($item, ['.', '..'])) {
             continue;
         }
-        echo str_repeat('-', $level), $item , PHP_EOL;
+        echo str_repeat('-', $level), $item, PHP_EOL;
         $rout = $dir . '/' . $item;
-        if ( is_dir($rout) ) {
-            readRecursive($rout, $level+1);
+        if (is_dir($rout)) {
+            readRecursive($rout, $level + 1);
         }
     }
 }
 
-readRecursive($baseDir, 0);
+readRecursive($baseDir);
