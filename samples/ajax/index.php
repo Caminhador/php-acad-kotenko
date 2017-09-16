@@ -3,7 +3,7 @@
 <body>
     <script>
         var xhr = new XMLHttpRequest();
-        xhr.open('PUT', 'http://localhost/php-acad-kotenko/samples/ajax/action.php', true);
+        xhr.open('POST', 'http://localhost/php-acad-kotenko/samples/ajax/action.php', true);
         xhr.setRequestHeader('Content-Type', 'application/json');
         xhr.onload = function() {
             if (xhr.status === 200) {
