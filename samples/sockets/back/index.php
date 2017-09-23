@@ -1,85 +1,61 @@
 <?php
 
-if (!extension_loaded('sockets')) {
-    die('WEB sockets are not allowed');
+error_reporting(E_ALL);
+
+/* Позволяет скрипту ожидать соединения бесконечно. */
+set_time_limit(0);
+
+/* Включает скрытое очищение вывода так, что мы получаем данные
+ * как только они появляются. */
+ob_implicit_flush();
+
+$address = '127.0.0.1';
+$port = 10000;
+
+if (($sock = socket_create(AF_INET, SOCK_STREAM, SOL_TCP)) === false) {
+    echo "Не удалось выполнить socket_create(): причина: " . socket_strerror(socket_last_error()) . "\n";
 }
 
-function go(){
-    $starttime = round(microtime(true),2);
-    echo "GO() ... <br />\r\n";
+if (socket_bind($sock, $address, $port) === false) {
+    echo "Не удалось выполнить socket_bind(): причина: " . socket_strerror(socket_last_error($sock)) . "\n";
+}
 
-    echo "socket_create ...";
-    $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+if (socket_listen($sock, 5) === false) {
+    echo "Не удалось выполнить socket_listen(): причина: " . socket_strerror(socket_last_error($sock)) . "\n";
+}
 
-    if($socket < 0){
-        echo "Error: ".socket_strerror(socket_last_error())."<br />\r\n";
-        exit();
-    } else {
-        echo "OK <br />\r\n";
+do {
+    if (($msgsock = socket_accept($sock)) === false) {
+        echo "Не удалось выполнить socket_accept(): причина: " . socket_strerror(socket_last_error($sock)) . "\n";
+        break;
     }
 
+    /* Отправляем инструкции. */
+    $msg = "\nДобро пожаловать на тестовый сервер PHP. \n" .
+        "Чтобы отключиться, наберите 'выход'. Чтобы выключить сервер, наберите 'выключение'.\n";
+    socket_write($msgsock, $msg);
 
-    echo "socket_bind ...";
-    $bind = socket_bind($socket, 'chat-back.local', 889);//привязываем его к указанным ip и порту
-    if($bind < 0){
-        echo "Error: ".socket_strerror(socket_last_error())."<br />\r\n";
-        exit();
-    }else{
-        echo "OK <br />\r\n";
-    }
-
-    socket_set_option($socket, SOL_SOCKET, SO_REUSEADDR, 1);//разрешаем использовать один порт для нескольких соединений
-
-    echo "Listening socket... ";
-    $listen = socket_listen($socket, 5);//слушаем сокет
-
-    if($listen < 0){
-        echo "Error: ".socket_strerror(socket_last_error())."<br />\r\n";
-        exit();
-    }else{
-        echo "OK <br />\r\n";
-    }
-
-    while(true){ //Бесконечный цикл ожидания подключений
-        echo "Waiting... ";
-        $accept = @socket_accept($socket); //Зависаем пока не получим ответа
-        if($accept === false){
-            echo "Error: ".socket_strerror(socket_last_error())."<br />\r\n";
-            usleep(100);
-        } else {
-            echo "OK <br />\r\n";
-            echo "Client \"".$accept."\" has connected<br />\r\n";
+    do {
+        if (false === ($buf = socket_read($msgsock, 2048, PHP_NORMAL_READ))) {
+            var_dump(socket_last_error($msgsock));
+            echo "Не удалось выполнить socket_read(): причина: " . socket_strerror(socket_last_error($msgsock)) . "\n";
+            break 2;
         }
-
-        $msg = "Hello, Client!";
-        echo "Send to client \"".$msg."\"... ";
-        socket_write($accept, $msg);
-        echo "OK <br />\r\n";
-
-        if( ( round(microtime(true),2) - $starttime) > 100) {
-            echo "time = ".(round(microtime(true),2) - $starttime);
-            echo "return <br />\r\n";
-            return $socket;
+        if (!$buf = trim($buf)) {
+            continue;
         }
+        if ($buf == 'выход') {
+            break;
+        }
+        if ($buf == 'выключение') {
+            socket_close($msgsock);
+            break 2;
+        }
+        $talkback = "PHP: Вы сказали '$buf'.\n";
+        socket_write($msgsock, $talkback, strlen($talkback));
+        echo "$buf\n";
+    } while (true);
+    socket_close($msgsock);
+} while (true);
 
-
-    }
-
-
-}
-
-error_reporting(E_ALL); //Выводим все ошибки и предупреждения
-set_time_limit(0);		//Время выполнения скрипта не ограничено
-ob_implicit_flush();	//Включаем вывод без буферизации
-
-$socket = go();			//Функция с бесконечным циклом, возвращает $socket по запросу выполненному по прошествии 100 секнуд.
-
-echo "go() ended<br />\r\n";
-
-if (isset($socket)){
-    echo "Closing connection... ";
-    @socket_shutdown($socket);
-    socket_close($socket);
-    echo "OK <br />\r\n";
-}
-
+socket_close($sock);
